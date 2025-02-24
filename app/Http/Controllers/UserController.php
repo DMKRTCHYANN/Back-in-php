@@ -15,7 +15,7 @@ class UserController extends Controller
             'country_id' => 'nullable|integer|exists:countries,id'
         ]);
 
-        $query = User::query()-> with('country');
+        $query = User::query()->with('country');
 
         if (!empty($request->get('country_id'))) {
             $query->where('country_id', $request->country_id);
@@ -46,7 +46,6 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
             'country_id' => 'required|integer|exists:countries,id',
         ]);
-//        dd($request->username);
         $user = User::create([
             'username' => $request->username,
             'password' => bcrypt($request->password),

@@ -10,9 +10,7 @@ class DisableCsrfMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        // Отключаем CSRF защиту для всех API-запросов
         if ($request->is('users')) {
-            // Обход защиты CSRF
             Session::forget('csrf_token');
         }
 
