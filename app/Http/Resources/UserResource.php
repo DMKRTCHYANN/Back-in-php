@@ -24,6 +24,7 @@ class UserResource extends JsonResource
                 'name' => $this->country->name,
                 'created_at' => $this->country->created_at->format('Y-m-d')
             ],
+            'image' => $this->image,
         ];
     }
 }

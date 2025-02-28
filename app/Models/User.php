@@ -21,6 +21,7 @@ class User extends Authenticatable
         'username',
         'password',
         'country_id',
+        'image',
     ];
 
     /**
@@ -63,3 +64,4 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class, 'country_id');
     }
 }
+

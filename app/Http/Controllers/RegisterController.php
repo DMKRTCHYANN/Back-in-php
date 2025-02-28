@@ -3,24 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
-
-    protected function validator(array $data)
+    public function register(Request $request)
     {
-        return Validator::make($data, [
-            'username' => ['required', 'string', 'max:255', 'unique:users'], // Validate unique username
-            'password' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' checks for password_confirmation
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', Password::min(4)->letters()->numbers(), 'confirmed'],
+            'country_id' => ['required', 'integer', 'exists:countries,id']
+        ]);
+
+        $data = $request->only(['username', 'password', 'country_id']);
+        $data['password'] = bcrypt($data['password']);
+
+        try {
+            $user = User::query()->create($data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'User creation failed.'], 500);
+        }
+
+        return $this->success([
+            'token' => $user->createToken('authToken')->accessToken
         ]);
     }
 
-    protected function create(array $data)
+    protected function success(array $data, $message = 'Success', $status = 200)
     {
-        return User::create([
-            'username' => $data['username'],
-            'password' => bcrypt($data['password']),
-        ]);
+        return response()->json([
+            'message' => $message,
+            'data' => $data
+        ], $status);
     }
 }
