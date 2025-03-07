@@ -21,7 +21,7 @@ class UserController extends Controller
             $query->where('country_id', $request->country_id);
         }
 
-        $users = $query->paginate(7);
+        $users = $query->paginate(5);
 
         return response()->json([
             'error' => false,

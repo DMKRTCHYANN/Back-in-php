@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Http\Resources\CountryResource;
 use Illuminate\Http\Request;
 
 class CountryController extends Controller
 {
     public function index()
     {
-        return response()->json(Country::all(), 200);
+        $countries = Country::all();
+        return response()->json([
+            'error' => false,
+            'data' => CountryResource::collection($countries),
+        ], 200);
     }
 
     public function store(Request $request)
@@ -18,36 +23,66 @@ class CountryController extends Controller
 
         $country = Country::create($request->all());
 
-        return response()->json(['message' => 'Country created successfully', 'country' => $country], 201);
+        return response()->json([
+            'error' => false,
+            'data' => new CountryResource($country),
+        ], 201);
     }
 
     public function show($id)
     {
-        $country = Country::findOrFail($id);
-        return response()->json(['country' => $country]);
-    }
+        $country = Country::find($id);
 
+        if (!$country) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Country not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'data' => new CountryResource($country),
+        ], 200);
+    }
 
     public function update(Request $request, $id)
     {
         $country = Country::find($id);
 
+        if (!$country) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Country not found',
+            ], 404);
+        }
 
         $request->validate(['name' => 'required|string|max:255']);
 
         $country->update($request->all());
 
-        return response()->json(['message' => 'Country updated successfully', 'country' => $country]);
+        return response()->json([
+            'error' => false,
+            'data' => new CountryResource($country),
+        ], 200);
     }
 
     public function destroy($id)
     {
         $country = Country::find($id);
-        if (!$country) {
-            return response()->json(['message' => 'Country not found'], 404);
-        }
-        $country->delete();
-            return response()->json(['message' => 'Country deleted successfully'], 200);
-    }
 
+        if (!$country) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Country not found',
+            ], 404);
+        }
+
+        $country->delete();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Country deleted successfully',
+        ], 200);
+    }
 }
