@@ -90,7 +90,6 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
